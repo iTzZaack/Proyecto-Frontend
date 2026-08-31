@@ -1,0 +1,235 @@
+/* ==========================================================================
+   FUENTES
+   Bricolage Grotesque: fuente para títulos (más expresiva, "display")
+   IBM Plex Sans: fuente para texto normal (más legible en párrafos)
+   ========================================================================== */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap");
+
+/* Tailwind: motor de utilidades CSS (clases como flex, px-4, etc.) */
+@import "tailwindcss";
+
+/* ==========================================================================
+   PALETA DE COLORES (@theme la registra como variables usables por Tailwind,
+   ej: bg-ink, text-amber, border-plum, etc.)
+   Se cambió el esquema oscuro-neutro por uno oscuro pero con colores
+   más saturados y vivos (fucsia, cian, ámbar intenso) para dar más energía
+   visual sin perder legibilidad.
+   ========================================================================== */
+@theme {
+  /* Fondo y superficies: se mantienen oscuros para contraste, con un tinte
+     ligeramente azul-violeta en vez de gris plano */
+  --color-ink: #0c0a1f;
+  --color-panel: #16122e;
+  --color-panel-raised: #1f1a3d;
+  --color-line: #322a5c;
+  --color-paper: #f5f0ff;
+  --color-mute: #a79bd1;
+
+  /* Colores de acento: más saturados que antes */
+  --color-amber: #ff9f1c;
+  --color-amber-light: #ffc971;
+  --color-good: #2ee6a6;
+  --color-bad: #ff4d6d;
+  --color-info: #4cc9f0;
+  --color-plum: #c77dff;
+
+  /* Nuevos colores de acento vivos, útiles para detalles decorativos */
+  --color-fuchsia: #ff2e88;
+  --color-lime: #baff29;
+
+  --font-display: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ==========================================================================
+   FONDO GENERAL
+   Se usa un gradiente radial doble (efecto "aurora") en vez de un color
+   plano, más un patrón de puntitos hecho 100% en CSS (radial-gradient
+   repetido) que simula una textura tipo "constelación" sin usar imágenes.
+   ========================================================================== */
+body {
+  background-color: var(--color-ink);
+  background-image:
+    radial-gradient(circle at 15% 20%, rgba(255, 46, 136, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(76, 201, 240, 0.16), transparent 45%),
+    radial-gradient(circle at 50% 100%, rgba(199, 125, 255, 0.14), transparent 50%),
+    radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: auto, auto, auto, 22px 22px;
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+/* ==========================================================================
+   ANIMACIONES REUTILIZABLES
+   ========================================================================== */
+
+/* Brillo pulsante suave, útil para resaltar elementos importantes
+   (ej. un botón de "crear evento" o un ícono destacado) */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(255, 159, 28, 0);
+  }
+  50% {
+    box-shadow: 0 0 18px 4px rgba(255, 159, 28, 0.45);
+  }
+}
+
+/* Flotación suave, útil para íconos o insignias decorativas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Aparición con leve escala, para elementos que "saltan" a la vista */
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-glow {
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3.2s ease-in-out infinite;
+}
+
+.animate-pop-in {
+  animation: pop-in 0.35s ease-out;
+}
+
+/* ==========================================================================
+   TARJETA TIPO "TALÓN DE BOLETO"
+   Simula un boleto de evento: dos perforaciones circulares a los lados,
+   como si estuviera desprendido de una hoja de entradas.
+   ========================================================================== */
+.ticket-card {
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Al pasar el mouse, la tarjeta se levanta un poco y brilla:
+   da sensación de interactividad sin necesitar JavaScript */
+.ticket-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(199, 125, 255, 0.25);
+}
+
+.ticket-card::before,
+.ticket-card::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background: var(--color-ink);
+  border-radius: 999px;
+  transform: translateY(-50%);
+}
+
+.ticket-card::before {
+  left: -9px;
+}
+
+.ticket-card::after {
+  right: -9px;
+}
+
+.ticket-divider {
+  border-top: 2px dashed var(--color-line);
+}
+
+/* ==========================================================================
+   BADGE DE CATEGORÍA CON ÍCONO (SVG inline vía background-image en base64
+   no es necesario: se usa un pseudo-elemento con un pequeño "diamante" SVG
+   codificado directamente en CSS como decoración, sin archivos externos)
+   ========================================================================== */
+.badge-categoria {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 22px;
+}
+
+.badge-categoria::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff9f1c' stroke-width='2'%3E%3Cpath d='M12 2l2.9 6.3L21 9.3l-4.6 4.5L17.5 20 12 16.8 6.5 20l1.1-6.2L3 9.3l6.1-1L12 2z'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+/* ==========================================================================
+   BOTONES CON EFECTO DE BRILLO AL PASAR EL MOUSE
+   Un "shine" que atraviesa el botón de izquierda a derecha al hacer hover,
+   como suelen tener los botones de apps modernas.
+   ========================================================================== */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shine::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.55s ease;
+}
+
+.btn-shine:hover::after {
+  left: 125%;
+}
+
+/* ==========================================================================
+   SCROLLBAR PERSONALIZADO
+   Detalle pequeño pero notorio: la barra de scroll toma los colores
+   del tema en vez de la barra gris por defecto del navegador.
+   ========================================================================== */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-panel);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--color-fuchsia), var(--color-info));
+  border-radius: 999px;
+}
+
+/* ==========================================================================
+   TEXTO CON DEGRADADO
+   Útil para títulos principales: el texto se rellena con un gradiente
+   en vez de un color sólido.
+   ========================================================================== */
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-fuchsia), var(--color-amber-light));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
