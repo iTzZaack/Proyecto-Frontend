@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Pencil, PlusCircle, UtensilsCrossed, StickyNote, Check } from 'lucide-react';
+import { Pencil, PlusCircle, UtensilsCrossed, StickyNote, Check, AlertCircle } from 'lucide-react';
 
 const REQUERIMIENTOS_LIST = [
   'Equipo de Sonido',
@@ -25,6 +25,10 @@ const PERSONAL_CATERING_LIST = ['Meseros', 'Chefs', 'Bartenders', 'Coordinador d
 const estiloCampo =
   'w-full rounded-md border border-line bg-panel-raised p-2 text-paper placeholder-mute ' +
   'focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber';
+
+// Igual que estiloCampo, pero con el borde en rojo cuando el campo tiene error.
+const estiloCampoConError = (tieneError) =>
+  `${estiloCampo} ${tieneError ? 'border-bad focus:border-bad focus:ring-bad' : ''}`;
 
 // Opción de selección (checkbox o radio) con apariencia de "chip" plano,
 // en vez del checkbox/radio nativo del navegador.
@@ -82,6 +86,7 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
   const [peticionesAdicionales, setPeticionesAdicionales] = useState(
     () => editingEvent?.peticionesAdicionales || ''
   );
+  const [errors, setErrors] = useState({});
 
   function resetForm() {
     setTitle('');
@@ -96,6 +101,7 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
     setPersonalCatering([]);
     setNotasCatering('');
     setPeticionesAdicionales('');
+    setErrors({});
   }
 
   const handleCheckboxChange = (item, state, setState) => {
@@ -106,11 +112,44 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
     }
   };
 
+  // Mensaje de error pequeño, mostrado debajo de un campo cuando falla la validación.
+  const CampoError = ({ mensaje }) =>
+    mensaje ? (
+      <p className="mt-1 flex items-center gap-1 text-xs text-bad">
+        <AlertCircle size={12} /> {mensaje}
+      </p>
+    ) : null;
+
+  // Revisa cada campo obligatorio y devuelve un objeto con los mensajes
+  // de error encontrados (vacío si todo está correcto).
+  const validar = () => {
+    const nuevosErrores = {};
+
+    if (!title.trim()) {
+      nuevosErrores.title = 'El nombre del evento es obligatorio.';
+    }
+    if (!location.trim()) {
+      nuevosErrores.location = 'La ubicación es obligatoria.';
+    }
+    if (!date) {
+      nuevosErrores.date = 'La fecha y hora son obligatorias.';
+    } else if (new Date(date) < new Date()) {
+      nuevosErrores.date = 'La fecha no puede ser en el pasado.';
+    }
+    if (!capacity) {
+      nuevosErrores.capacity = 'El cupo máximo es obligatorio.';
+    } else if (Number(capacity) <= 0) {
+      nuevosErrores.capacity = 'El cupo máximo debe ser mayor a 0.';
+    }
+
+    return nuevosErrores;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!title.trim() || !date || !location.trim() || !capacity) {
-      return alert('Por favor completa los campos principales (Título, Fecha, Lugar y Cupo).');
-    }
+    const nuevosErrores = validar();
+    setErrors(nuevosErrores);
+    if (Object.keys(nuevosErrores).length > 0) return;
 
     const payload = {
       title,
@@ -164,8 +203,9 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
             placeholder="Ej. Conferencia de Software"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className={estiloCampo}
+            className={estiloCampoConError(errors.title)}
           />
+          <CampoError mensaje={errors.title} />
         </div>
         <div>
           <label className="mb-1 block text-xs text-mute">Organizador</label>
@@ -192,8 +232,9 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
             type="datetime-local"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className={estiloCampo}
+            className={estiloCampoConError(errors.date)}
           />
+          <CampoError mensaje={errors.date} />
         </div>
         <div>
           <label className="mb-1 block text-xs text-mute">Ubicación / Lugar *</label>
@@ -202,8 +243,9 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
             placeholder="Ej. Auditorio CENESTUR"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            className={estiloCampo}
+            className={estiloCampoConError(errors.location)}
           />
+          <CampoError mensaje={errors.location} />
         </div>
         <div>
           <label className="mb-1 block text-xs text-mute">Cupo Máximo *</label>
@@ -213,8 +255,9 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
             value={capacity}
             min="1"
             onChange={(e) => setCapacity(e.target.value)}
-            className={estiloCampo}
+            className={estiloCampoConError(errors.capacity)}
           />
+          <CampoError mensaje={errors.capacity} />
         </div>
       </div>
 

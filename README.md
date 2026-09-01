@@ -16,8 +16,8 @@ Proyecto de Front-End para la carrera de Desarrollo de Software. Permite crear, 
 3. **Búsqueda y filtros:** por título, lugar y categoría (Conferencia, Taller, Deportes, Social).
 4. **Estadísticas:** total de eventos, asistentes registrados y cupos disponibles, con animación de conteo.
 5. **Persistencia:** los datos se guardan en `LocalStorage` y se recuperan al abrir la app.
-6. **Validaciones:** el formulario no permite guardar con campos vacíos.
-7. **Interacciones animadas:** filtro de categorías con selector deslizante, barra de aforo animada, números que cuentan al cambiar, y modal de confirmación al eliminar (en vez del `confirm()` del navegador).
+6. **Validaciones:** el formulario valida que el título, la ubicación, la fecha y el cupo no estén vacíos, que la fecha no sea anterior al momento actual y que el cupo máximo sea mayor a 0, mostrando el mensaje de error debajo de cada campo.
+7. **Interacciones animadas:** filtro de categorías con selector deslizante, barra de aforo animada y números que cuentan al cambiar.
 
 ## Estructura del proyecto
 ```
@@ -25,11 +25,9 @@ src/
 ├── components/
 │   ├── Navbar.jsx
 │   ├── EventForm.jsx
-│   ├── EventItem.jsx
 │   ├── SearchAndFilter.jsx
 │   ├── EventStats.jsx
 │   ├── EventList.jsx
-│   ├── ConfirmDialog.jsx   # modal de confirmación antes de eliminar
 │   └── Footer.jsx
 ├── hooks/
 │   └── useCountUp.js       # animación de conteo para las estadísticas
