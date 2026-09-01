@@ -1,4 +1,15 @@
 import { useState, useEffect } from 'react';
+import {
+  Check,
+  Palette,
+  UtensilsCrossed,
+  Users,
+  StickyNote,
+  Clock,
+  CircleDot,
+  Calendar,
+  MapPin
+} from 'lucide-react';
 
 export default function EventList({ events, onRegister, onUnregister, onDelete, onEdit }) {
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -90,33 +101,55 @@ export default function EventList({ events, onRegister, onUnregister, onDelete, 
                         {event.indicaciones.map((ind, idx) => (
                           <span
                             key={idx}
-                            className="rounded border border-line bg-panel-raised px-2 py-0.5 text-[10px] text-mute"
+                            className="inline-flex items-center gap-1 rounded border border-line bg-panel-raised px-2 py-0.5 text-[10px] text-mute"
                           >
-                            ✓ {ind}
+                            <Check size={10} className="text-good" strokeWidth={3} />
+                            {ind}
                           </span>
                         ))}
                       </div>
                     )}
 
-                    <div className="mt-2 space-y-0.5 text-[11px] text-mute">
+                    <div className="mt-2 space-y-1 text-[11px] text-mute">
                       {event.decoracion && (
-                        <div>
-                          🎨 Decoración: <span className="text-paper">{event.decoracion}</span>
+                        <div className="flex items-start gap-1.5">
+                          <Palette size={12} className="mt-0.5 shrink-0 text-fuchsia" />
+                          <span>
+                            Decoración: <span className="text-paper">{event.decoracion}</span>
+                          </span>
                         </div>
                       )}
                       {event.comidas?.length > 0 && (
-                        <div>
-                          🍽️ Menú: <span className="text-paper">{event.comidas.join(', ')}</span>
+                        <div className="flex items-start gap-1.5">
+                          <UtensilsCrossed size={12} className="mt-0.5 shrink-0 text-amber" />
+                          <span>
+                            Menú: <span className="text-paper">{event.comidas.join(', ')}</span>
+                          </span>
                         </div>
                       )}
                       {event.personalCatering?.length > 0 && (
-                        <div>
-                          👥 Personal: <span className="text-paper">{event.personalCatering.join(', ')}</span>
+                        <div className="flex items-start gap-1.5">
+                          <Users size={12} className="mt-0.5 shrink-0 text-info" />
+                          <span>
+                            Personal: <span className="text-paper">{event.personalCatering.join(', ')}</span>
+                          </span>
                         </div>
                       )}
                       {event.notasCatering && (
-                        <div>
-                          📝 Notas: <span className="italic text-mute">{event.notasCatering}</span>
+                        <div className="flex items-start gap-1.5">
+                          <StickyNote size={12} className="mt-0.5 shrink-0" />
+                          <span>
+                            Notas de catering: <span className="italic text-mute">{event.notasCatering}</span>
+                          </span>
+                        </div>
+                      )}
+                      {event.peticionesAdicionales && (
+                        <div className="flex items-start gap-1.5">
+                          <StickyNote size={12} className="mt-0.5 shrink-0" />
+                          <span>
+                            Peticiones adicionales:{' '}
+                            <span className="italic text-mute">{event.peticionesAdicionales}</span>
+                          </span>
                         </div>
                       )}
                     </div>
@@ -128,19 +161,25 @@ export default function EventList({ events, onRegister, onUnregister, onDelete, 
                     </span>
 
                     {isExpired ? (
-                      <span className="inline-block rounded-full border border-bad bg-bad/15 px-2 py-0.5 text-xs font-bold text-bad">
-                        ⏰ Evento Finalizado
+                      <span className="inline-flex w-fit items-center gap-1 rounded-full border border-bad bg-bad/15 px-2 py-0.5 text-xs font-bold text-bad">
+                        <Clock size={12} /> Evento Finalizado
                       </span>
                     ) : (
-                      <span className="inline-block rounded-full border border-good bg-good/15 px-2 py-0.5 text-xs font-bold text-good">
-                        🟢 A Tiempo / Vigente
+                      <span className="inline-flex w-fit items-center gap-1 rounded-full border border-good bg-good/15 px-2 py-0.5 text-xs font-bold text-good">
+                        <CircleDot size={12} /> A Tiempo / Vigente
                       </span>
                     )}
                   </td>
 
                   <td className="p-4 text-sm">
-                    <div>📅 {event.date ? new Date(event.date).toLocaleString() : 'N/A'}</div>
-                    <div className="mt-1 text-xs text-mute">📍 {event.location}</div>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar size={13} className="text-mute" />
+                      {event.date ? new Date(event.date).toLocaleString() : 'N/A'}
+                    </div>
+                    <div className="mt-1 flex items-center gap-1.5 text-xs text-mute">
+                      <MapPin size={12} />
+                      {event.location}
+                    </div>
                   </td>
 
                   <td className="p-4 text-sm">

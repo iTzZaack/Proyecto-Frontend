@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { Ticket } from 'lucide-react';
 
 // Barra de navegación superior. Usa motion.header para que aparezca
 // con una animación sutil al cargar la página (se desliza hacia abajo
@@ -24,8 +25,8 @@ export default function Navbar() {
 
       <div className="relative mx-auto flex max-w-5xl items-center justify-center gap-3 px-4 py-6">
         {/* Ícono decorativo (una entrada/ticket, con leve flotación) */}
-        <motion.span className="animate-float text-3xl" aria-hidden="true">
-          🎟️
+        <motion.span className="animate-float text-amber" aria-hidden="true">
+          <Ticket size={32} strokeWidth={2} />
         </motion.span>
         <h1 className="text-gradient font-display text-3xl font-extrabold tracking-tight">
           Gestión de eventos

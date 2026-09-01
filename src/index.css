@@ -138,7 +138,7 @@ body {
    TEXTO CON DEGRADADO
    ========================================================================== */
 .text-gradient {
-  background: linear-gradient(90deg, var(--color-fuchsia), var(--color-amber-light));
+  background: linear-gradient(90deg, var(--color-fuchsia), var(--color-plum));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

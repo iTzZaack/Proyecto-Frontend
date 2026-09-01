@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Pencil, PlusCircle, UtensilsCrossed, StickyNote, Check } from 'lucide-react';
 
 const REQUERIMIENTOS_LIST = [
   'Equipo de Sonido',
@@ -24,6 +25,41 @@ const PERSONAL_CATERING_LIST = ['Meseros', 'Chefs', 'Bartenders', 'Coordinador d
 const estiloCampo =
   'w-full rounded-md border border-line bg-panel-raised p-2 text-paper placeholder-mute ' +
   'focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber';
+
+// Opción de selección (checkbox o radio) con apariencia de "chip" plano,
+// en vez del checkbox/radio nativo del navegador.
+function OpcionSeleccionable({ type, name, label, checked, onChange }) {
+  return (
+    <label
+      className={`flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors ${
+        checked
+          ? 'border-amber bg-amber/10 text-paper'
+          : 'border-line bg-panel text-mute hover:border-mute hover:text-paper'
+      }`}
+    >
+      <input
+        type={type}
+        name={name}
+        checked={checked}
+        onChange={onChange}
+        className="sr-only"
+      />
+      <span
+        className={`flex h-4 w-4 shrink-0 items-center justify-center border transition-colors ${
+          type === 'radio' ? 'rounded-full' : 'rounded'
+        } ${checked ? 'border-amber bg-amber' : 'border-line bg-panel-raised'}`}
+      >
+        {checked &&
+          (type === 'radio' ? (
+            <span className="h-1.5 w-1.5 rounded-full bg-ink" />
+          ) : (
+            <Check size={11} strokeWidth={3} className="text-ink" />
+          ))}
+      </span>
+      <span>{label}</span>
+    </label>
+  );
+}
 
 // EventForm recibe "key={editingEvent?.id ?? 'new'}" desde App.jsx.
 // Gracias a eso, React DESTRUYE y vuelve a MONTAR este componente cada
@@ -73,7 +109,7 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim() || !date || !location.trim() || !capacity) {
-      return alert('⚠️ Por favor completa los campos principales (Título, Fecha, Lugar y Cupo).');
+      return alert('Por favor completa los campos principales (Título, Fecha, Lugar y Cupo).');
     }
 
     const payload = {
@@ -107,8 +143,16 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
         editingEvent ? 'border-amber' : 'border-line'
       }`}
     >
-      <h2 className="mb-4 font-display text-xl font-bold text-paper">
-        {editingEvent ? '✏️ Editar Evento' : '➕ Registrar Nuevo Evento'}
+      <h2 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-paper">
+        {editingEvent ? (
+          <>
+            <Pencil size={20} className="text-amber" /> Editar Evento
+          </>
+        ) : (
+          <>
+            <PlusCircle size={20} className="text-amber" /> Registrar Nuevo Evento
+          </>
+        )}
       </h2>
 
       {/* Datos Generales */}
@@ -177,17 +221,15 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
       {/* Indicaciones / Equipamiento */}
       <div className="mb-4">
         <label className="mb-2 block text-xs text-mute">Indicaciones y Requerimientos Específicos</label>
-        <div className="grid grid-cols-2 gap-2 rounded border border-line bg-panel-raised p-3 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-2 rounded-lg border border-line bg-panel-raised p-3 md:grid-cols-3">
           {REQUERIMIENTOS_LIST.map((item) => (
-            <label key={item} className="flex cursor-pointer items-center space-x-2 text-sm text-paper">
-              <input
-                type="checkbox"
-                checked={indicaciones.includes(item)}
-                onChange={() => handleCheckboxChange(item, indicaciones, setIndicaciones)}
-                className="rounded"
-              />
-              <span>{item}</span>
-            </label>
+            <OpcionSeleccionable
+              key={item}
+              type="checkbox"
+              label={item}
+              checked={indicaciones.includes(item)}
+              onChange={() => handleCheckboxChange(item, indicaciones, setIndicaciones)}
+            />
           ))}
         </div>
       </div>
@@ -195,39 +237,37 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
       {/* Tipo de Decoración */}
       <div className="mb-4">
         <label className="mb-2 block text-xs text-mute">Tipo de Decoración</label>
-        <div className="flex flex-wrap gap-4 rounded border border-line bg-panel-raised p-3">
+        <div className="grid grid-cols-2 gap-2 rounded-lg border border-line bg-panel-raised p-3 md:grid-cols-3 lg:grid-cols-5">
           {DECORACION_LIST.map((tipo) => (
-            <label key={tipo} className="flex cursor-pointer items-center space-x-2 text-sm text-paper">
-              <input
-                type="radio"
-                name="decoracion"
-                value={tipo}
-                checked={decoracion === tipo}
-                onChange={(e) => setDecoracion(e.target.value)}
-              />
-              <span>{tipo}</span>
-            </label>
+            <OpcionSeleccionable
+              key={tipo}
+              type="radio"
+              name="decoracion"
+              label={tipo}
+              checked={decoracion === tipo}
+              onChange={() => setDecoracion(tipo)}
+            />
           ))}
         </div>
       </div>
 
       {/* Sección Catering */}
       <div className="mb-4 rounded-lg border border-line bg-panel-raised p-4">
-        <h3 className="mb-3 font-display text-md font-semibold text-amber">🍽️ Sección de Catering</h3>
+        <h3 className="mb-3 flex items-center gap-2 font-display text-md font-semibold text-amber">
+          <UtensilsCrossed size={18} /> Sección de Catering
+        </h3>
 
         <div className="mb-3">
           <label className="mb-1 block text-xs text-mute">Tipo de Comida (Selección Múltiple)</label>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             {COMIDAS_LIST.map((food) => (
-              <label key={food} className="flex cursor-pointer items-center space-x-2 text-sm text-paper">
-                <input
-                  type="checkbox"
-                  checked={comidas.includes(food)}
-                  onChange={() => handleCheckboxChange(food, comidas, setComidas)}
-                  className="rounded"
-                />
-                <span>{food}</span>
-              </label>
+              <OpcionSeleccionable
+                key={food}
+                type="checkbox"
+                label={food}
+                checked={comidas.includes(food)}
+                onChange={() => handleCheckboxChange(food, comidas, setComidas)}
+              />
             ))}
           </div>
         </div>
@@ -236,15 +276,13 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
           <label className="mb-1 block text-xs text-mute">Personal de Catering Requerido</label>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
             {PERSONAL_CATERING_LIST.map((staff) => (
-              <label key={staff} className="flex cursor-pointer items-center space-x-2 text-sm text-paper">
-                <input
-                  type="checkbox"
-                  checked={personalCatering.includes(staff)}
-                  onChange={() => handleCheckboxChange(staff, personalCatering, setPersonalCatering)}
-                  className="rounded"
-                />
-                <span>{staff}</span>
-              </label>
+              <OpcionSeleccionable
+                key={staff}
+                type="checkbox"
+                label={staff}
+                checked={personalCatering.includes(staff)}
+                onChange={() => handleCheckboxChange(staff, personalCatering, setPersonalCatering)}
+              />
             ))}
           </div>
         </div>
@@ -263,7 +301,9 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
 
       {/* Observaciones y Peticiones Adicionales */}
       <div className="mb-6">
-        <label className="mb-1 block text-xs text-mute">📝 Observaciones y Peticiones Adicionales del Evento</label>
+        <label className="mb-1 flex items-center gap-1.5 text-xs text-mute">
+          <StickyNote size={13} /> Observaciones y Peticiones Adicionales del Evento
+        </label>
         <textarea
           rows="3"
           placeholder="Escribe aquí cualquier solicitud especial, notas de organización o requerimiento adicional..."

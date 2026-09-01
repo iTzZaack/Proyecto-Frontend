@@ -68,7 +68,7 @@ export default function App() {
     <div className="flex min-h-screen flex-col justify-between bg-ink text-paper">
       <div>
         <Navbar />
-        <main className="mx-auto max-w-6xl px-4 pb-12">
+        <main className="mx-auto max-w-6xl px-4 pb-12 pt-8">
           <EventStats events={events} />
           <EventForm
             key={editingEvent?.id ?? 'new'}
