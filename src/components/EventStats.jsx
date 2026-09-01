@@ -1,8 +1,5 @@
 import { useCountUp } from '../hooks/useCountUp';
 
-// Sub-componente para cada tarjeta individual de estadística.
-// useCountUp anima el número contando desde el valor anterior hasta
-// el nuevo (en vez de que el número simplemente "salte" al cambiar).
 function TarjetaEstadistica({ valor, etiqueta }) {
   const valorAnimado = useCountUp(valor);
 
@@ -17,9 +14,6 @@ function TarjetaEstadistica({ valor, etiqueta }) {
 }
 
 export default function EventStats({ events }) {
-  // Estos 3 valores se recalculan en cada render a partir de la lista
-  // de eventos, no se guardan en un estado propio (derivados, no fuente
-  // de verdad) para evitar que se desincronicen de la lista real.
   const totalEventos = events.length;
   const totalAsistentes = events.reduce((suma, evento) => suma + evento.attendees, 0);
   const cuposDisponibles = events.reduce(
