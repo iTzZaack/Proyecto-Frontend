@@ -78,8 +78,25 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
   const [capacity, setCapacity] = useState(() => editingEvent?.capacity || '');
   const [organizer, setOrganizer] = useState(() => editingEvent?.organizer || '');
 
-  const [indicaciones, setIndicaciones] = useState(() => editingEvent?.indicaciones || []);
-  const [decoracion, setDecoracion] = useState(() => editingEvent?.decoracion || 'Sin Decoración');
+  const [indicaciones, setIndicaciones] = useState(() =>
+    (editingEvent?.indicaciones || []).filter((i) => REQUERIMIENTOS_LIST.includes(i))
+  );
+  const [otroIndicacionActivo, setOtroIndicacionActivo] = useState(() =>
+    (editingEvent?.indicaciones || []).some((i) => !REQUERIMIENTOS_LIST.includes(i))
+  );
+  const [otroIndicacionTexto, setOtroIndicacionTexto] = useState(
+    () => (editingEvent?.indicaciones || []).find((i) => !REQUERIMIENTOS_LIST.includes(i)) || ''
+  );
+
+  const [decoracion, setDecoracion] = useState(() => {
+    const valorGuardado = editingEvent?.decoracion;
+    if (!valorGuardado || DECORACION_LIST.includes(valorGuardado)) return valorGuardado || 'Sin Decoración';
+    return 'Otro';
+  });
+  const [decoracionOtroTexto, setDecoracionOtroTexto] = useState(() => {
+    const valorGuardado = editingEvent?.decoracion;
+    return valorGuardado && !DECORACION_LIST.includes(valorGuardado) ? valorGuardado : '';
+  });
   const [comidas, setComidas] = useState(() => editingEvent?.comidas || []);
   const [personalCatering, setPersonalCatering] = useState(() => editingEvent?.personalCatering || []);
   const [notasCatering, setNotasCatering] = useState(() => editingEvent?.notasCatering || '');
@@ -96,7 +113,10 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
     setCapacity('');
     setOrganizer('');
     setIndicaciones([]);
+    setOtroIndicacionActivo(false);
+    setOtroIndicacionTexto('');
     setDecoracion('Sin Decoración');
+    setDecoracionOtroTexto('');
     setComidas([]);
     setPersonalCatering([]);
     setNotasCatering('');
@@ -151,6 +171,14 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
     setErrors(nuevosErrores);
     if (Object.keys(nuevosErrores).length > 0) return;
 
+    // Si el usuario marcó "Otro" y escribió algo, se añade a la lista de
+    // indicaciones / se usa como el tipo de decoración final.
+    const indicacionesFinal = [
+      ...indicaciones,
+      ...(otroIndicacionActivo && otroIndicacionTexto.trim() ? [otroIndicacionTexto.trim()] : [])
+    ];
+    const decoracionFinal = decoracion === 'Otro' ? decoracionOtroTexto.trim() || 'Otro' : decoracion;
+
     const payload = {
       title,
       category,
@@ -158,8 +186,8 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
       location,
       capacity: parseInt(capacity, 10),
       organizer,
-      indicaciones,
-      decoracion,
+      indicaciones: indicacionesFinal,
+      decoracion: decoracionFinal,
       comidas,
       personalCatering,
       notasCatering,
@@ -274,7 +302,27 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
               onChange={() => handleCheckboxChange(item, indicaciones, setIndicaciones)}
             />
           ))}
+          <OpcionSeleccionable
+            type="checkbox"
+            label="Otro"
+            checked={otroIndicacionActivo}
+            onChange={() => {
+              const activar = !otroIndicacionActivo;
+              setOtroIndicacionActivo(activar);
+              if (!activar) setOtroIndicacionTexto('');
+            }}
+          />
         </div>
+        {otroIndicacionActivo && (
+          <input
+            type="text"
+            autoFocus
+            placeholder="Especifica el requerimiento..."
+            value={otroIndicacionTexto}
+            onChange={(e) => setOtroIndicacionTexto(e.target.value)}
+            className={`${estiloCampo} mt-2`}
+          />
+        )}
       </div>
 
       {/* Tipo de Decoración */}
@@ -291,7 +339,24 @@ export default function EventForm({ onAddEvent, onUpdateEvent, editingEvent, set
               onChange={() => setDecoracion(tipo)}
             />
           ))}
+          <OpcionSeleccionable
+            type="radio"
+            name="decoracion"
+            label="Otro"
+            checked={decoracion === 'Otro'}
+            onChange={() => setDecoracion('Otro')}
+          />
         </div>
+        {decoracion === 'Otro' && (
+          <input
+            type="text"
+            autoFocus
+            placeholder="Especifica el tipo de decoración..."
+            value={decoracionOtroTexto}
+            onChange={(e) => setDecoracionOtroTexto(e.target.value)}
+            className={`${estiloCampo} mt-2`}
+          />
+        )}
       </div>
 
       {/* Sección Catering */}
