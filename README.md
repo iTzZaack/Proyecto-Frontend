@@ -25,6 +25,7 @@ src/
 ├── components/
 │   ├── Navbar.jsx
 │   ├── EventForm.jsx
+│   ├── EventItem.jsx
 │   ├── SearchAndFilter.jsx
 │   ├── EventStats.jsx
 │   ├── EventList.jsx
